@@ -35,7 +35,15 @@ object Exercise2_1 {
     private val A = Mat(IndexedSeq(IndexedSeq(1, 1), IndexedSeq(1, 0)))
     private val E = Mat.E(2)
 
+    /**
+     * フィボナッチ数を行列計算を使用してO(log N)で求めます。
+     */
     def fibMat(n: Int) = {
+      /*
+      行列Aを((1, 1), (1, 0))とおくと、A^nの2行1列目の要素の値がフィボナッチ数列のn項目と一致する。
+      A^2 * A^2 = A^4、A^4 * A^4 = A^8 となることを利用して計算量をO(log N)に抑えることができる。
+      ただし個々の演算は行列の乗算なので遅いため、nが大きくないと有利にならない。
+       */
       @tailrec
       def loop(n: Int, a: Mat, b: Mat): Int = n match {
         case 0 => b(1, 0)
