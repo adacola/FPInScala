@@ -59,4 +59,42 @@ object List {
 
   def init[A](l: List[A]): List[A] = reverse(tail(reverse(l)))
 
+  def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = as match {
+    case Nil => z
+    case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+  }
+
+  def lengthFR[A](as: List[A]) = foldRight(as, 0) { (_, r) => r + 1 }
+
+  def foldLeft[A, B](as: List[A], z: B)(f: (B, A) => B): B = {
+    @annotation.tailrec
+    def loop(as: List[A], z: B): B = as match {
+      case Nil => z
+      case Cons(x, xs) => loop(xs, f(z, x))
+    }
+    loop(as, z)
+  }
+
+  def sumFL(as: List[Int]): Int = foldLeft(as, 0)(_ + _)
+
+  def productFL(as: List[Double]): Double = foldLeft(as, 1.0)(_ * _)
+
+  def lengthFL[A](as: List[A]): Int = foldLeft(as, 0) { (r, _) => r + 1 }
+
+  def reverseFL[A](as: List[A]): List[A] = foldLeft(as, Nil: List[A]) { (xs, x) => Cons(x, xs) }
+
+  def foldLeftFR[A, B](as: List[A], z: B)(f: (B, A) => B): B = foldRight(List.reverse(as), z) { (x, y) => f(y, x) }
+
+  def foldRightFL[A, B](as: List[A], z: B)(f: (A, B) => B): B = foldLeft(List.reverse(as), z) { (x, y) => f(y, x) }
+
+  def append[A](as: List[A], bs: List[A]): List[A] = foldRightFL(as, bs)(Cons(_, _))
+
+  def flatten[A](ass: List[List[A]]): List[A] = foldRightFL(ass, Nil: List[A]) { (xs, ys) => append(xs, ys) }
+
+  def add1(as: List[Int]): List[Int] = foldRightFL(as, Nil: List[Int]) { (x, xs) => Cons(x + 1, xs) }
+
+  def doubleToString(as: List[Double]): List[String] = foldRightFL(as, Nil: List[String]) { (x, xs) => Cons(x.toString, xs) }
+
+  def map[A, B](as: List[A])(f: A => B): List[B] = foldRightFL(as, Nil: List[B]) { (x, xs) => Cons(f(x), xs) }
+
 }
